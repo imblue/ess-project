@@ -60,8 +60,8 @@ int main(void)
 
 
     /*Initialize+start UART Task*/
-    (void)setup_UART_Task(15);
-    System_printf("Created UART Task\n");
+    //(void)setup_UART_Task(1);
+    //System_printf("Created UART Task\n");
 
 
 

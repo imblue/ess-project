@@ -30,12 +30,11 @@
 // H2 top
 // P5 bottom
 #define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOH
-//static const int LATCH_SYS_PORT = SYSCTL_PERIPH_GPIOH;
 static const int LATCH_PORT = GPIO_PORTH_BASE;
 static const int LATCH_PIN = GPIO_PIN_2;
 
 // 0 = top; 1 = bottom
-UInt peripheralNum = 0;
+#define PERIPHAL Board_SPI0
 
 SPI_Handle handle;
 
@@ -81,6 +80,9 @@ void OutputFxn(UArg arg0, UArg arg1)
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, 0);
 
         Task_sleep(wait_ticks);
+
+        //GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
+        //GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, 0);
     }
 }
 
@@ -117,6 +119,10 @@ int setup_spi() {
     Board_initGPIO();
     Board_initSPI();
 
+    // Reset = C7
+    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    //GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_7);
+
     // Latch = H2
     SysCtlPeripheralEnable(LATCH_SYS_PORT);
     GPIOPinTypeGPIOOutput(LATCH_PORT, LATCH_PIN);
@@ -128,10 +134,10 @@ int setup_spi() {
     spiParams.transferCallbackFxn = NULL;
     spiParams.bitRate = 2000000;
     spiParams.dataSize = 8;
-    spiParams.frameFormat = SPI_POL0_PHA0;
+    //spiParams.frameFormat = SPI_POL0_PHA0;
     spiParams.mode = SPI_MASTER;
 
-    handle = SPI_open(Board_SPI0, &spiParams);
+    handle = SPI_open(PERIPHAL, &spiParams);
     if (handle == NULL) {
       System_printf("SPI did not open\n");
     }

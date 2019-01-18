@@ -32,7 +32,7 @@
  */
 void BlinkFxn(UArg arg0, UArg arg1)
 {
-    led_descriptor_t *led_desc = (led_descriptor_t *)arg0;
+    struct led_descriptor *led_desc = (struct led_descriptor *)arg0;
     uint32_t wait_ticks = (uint32_t)arg1;
     /* GPIO driverlib API uses same bit pattern for GPIO mask and value. */
     uint8_t ui8val = (uint8_t)led_desc->led;
@@ -50,7 +50,7 @@ void BlinkFxn(UArg arg0, UArg arg1)
 /*
  *  Setup task function
  */
-int setup_Blink_Task(int prio, xdc_String name, led_descriptor_t *led_desc, uint32_t wait_ticks)
+int setup_Blink_Task(struct led_descriptor *led_desc, uint32_t wait_ticks)
 {
     Task_Params taskLedParams;
     Task_Handle taskLed;
@@ -62,9 +62,8 @@ int setup_Blink_Task(int prio, xdc_String name, led_descriptor_t *led_desc, uint
     /* Create blink task with priority 15*/
     Error_init(&eb);
     Task_Params_init(&taskLedParams);
-    taskLedParams.instance->name = name;
     taskLedParams.stackSize = 1024; /* stack in bytes */
-    taskLedParams.priority = prio; /* 0-15 (15 is highest priority on default -> see RTOS Task configuration) */
+    taskLedParams.priority = 15; /* 0-15 (15 is highest priority on default -> see RTOS Task configuration) */
     taskLedParams.arg0 = (UArg)led_desc; /* pass led descriptor as arg0 */
     taskLedParams.arg1 = (UArg)wait_ticks; /* pass periods in ticks as arg1 */
     taskLed = Task_create((Task_FuncPtr)BlinkFxn, &taskLedParams, &eb);

@@ -15,10 +15,10 @@
 #include <xdc/std.h>
 
 
-typedef struct {
+struct led_descriptor {
 	uint32_t port_base;
 	uint8_t led;
-} led_descriptor_t;
+};
 
 
 /*! \fn BlinkFxn
@@ -35,13 +35,11 @@ void BlinkFxn(UArg arg0, UArg arg1);
  *  Setup Blink task
  *  Task has highest priority and receives 1kB of stack
  *
- *   \param prio the task's priority.
- *   \param name the task's name.
  *   \param led_desc LED descriptor.
  *   \param time to wait in ticks for led to toggle
  *
  *  \return always zero. In case of error the system halts.
  */
-int setup_Blink_Task(int prio, xdc_String name, led_descriptor_t *led_desc, uint32_t wait_ticks);
+int setup_Blink_Task(struct led_descriptor *led_desc, uint32_t wait_ticks);
 
 #endif

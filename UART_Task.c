@@ -31,7 +31,7 @@
 
 /* Application headers */
 #include "UART_Task.h"
-#include "Output_UART.h"
+
 
 /*
  *  ======== UART  ========
@@ -62,14 +62,6 @@ void UARTFxn(UArg arg0, UArg arg1)
     while (1) {
         char input;
         UART_read(uart, &input, 1);
-
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-        UART_write(uart, &input, 1); // Remove this line to stop echoing!
-
-        if (input == 'o') {
-            output_UART_read(uart);
-        }
-
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
         UART_write(uart, &input, 1); // Remove this line to stop echoing!
         Task_sleep(5);
@@ -81,7 +73,7 @@ void UARTFxn(UArg arg0, UArg arg1)
 /*
  *  Setup task function
  */
-int setup_UART_Task(int prio)
+int setup_UART_Task(void)
 {
     Task_Params taskUARTParams;
     Task_Handle taskUART;
@@ -102,7 +94,7 @@ int setup_UART_Task(int prio)
     Error_init(&eb);
     Task_Params_init(&taskUARTParams);
     taskUARTParams.stackSize = 1024; /* stack in bytes */
-    taskUARTParams.priority = prio; /* 0-15 (15 is highest priority on default -> see RTOS Task configuration) */
+    taskUARTParams.priority = 15; /* 0-15 (15 is highest priority on default -> see RTOS Task configuration) */
     taskUART = Task_create((Task_FuncPtr)UARTFxn, &taskUARTParams, &eb);
     if (taskUART == NULL) {
         System_abort("TaskUART create failed");

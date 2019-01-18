@@ -28,13 +28,16 @@
 #include <ti/drivers/SPI.h>
 
 // H2 top
-// P5 bottom
-#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOH
+/*#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOH
 static const int LATCH_PORT = GPIO_PORTH_BASE;
 static const int LATCH_PIN = GPIO_PIN_2;
+#define PERIPHAL Board_SPI0*/
 
-// 0 = top; 1 = bottom
-#define PERIPHAL Board_SPI0
+// P5 bottom
+#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOP
+static const int LATCH_PORT = GPIO_PORTP_BASE;
+static const int LATCH_PIN = GPIO_PIN_5;
+#define PERIPHAL Board_SPI1
 
 SPI_Handle handle;
 
@@ -81,8 +84,8 @@ void OutputFxn(UArg arg0, UArg arg1)
 
         Task_sleep(wait_ticks);
 
-        //GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
-        //GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, 0);
+        GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
+        GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, 0);
     }
 }
 
@@ -134,7 +137,7 @@ int setup_spi() {
     spiParams.transferCallbackFxn = NULL;
     spiParams.bitRate = 2000000;
     spiParams.dataSize = 8;
-    //spiParams.frameFormat = SPI_POL0_PHA0;
+    spiParams.frameFormat = SPI_POL0_PHA0;
     spiParams.mode = SPI_MASTER;
 
     handle = SPI_open(PERIPHAL, &spiParams);

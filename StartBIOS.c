@@ -37,9 +37,10 @@
 int main(void)
 {
     uint32_t ui32SysClock;
+    ui32SysClock = Board_initGeneral(120*1000*1000);
+
     //static struct led_descriptor led_desc[2];
     /* Call board init functions. */
-    ui32SysClock = Board_initGeneral(120*1000*1000);
     /*(void)ui32SysClock; // We don't really need this (yet)
 
     led_desc[0].port_base = GPIO_PORTN_BASE;

@@ -28,16 +28,16 @@
 #include <ti/drivers/SPI.h>
 
 // H2 top
-/*#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOH
+#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOH
 static const int LATCH_PORT = GPIO_PORTH_BASE;
 static const int LATCH_PIN = GPIO_PIN_2;
-#define PERIPHAL Board_SPI0*/
+#define PERIPHAL Board_SPI0
 
 // P5 bottom
-#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOP
+/*#define LATCH_SYS_PORT SYSCTL_PERIPH_GPIOP
 static const int LATCH_PORT = GPIO_PORTP_BASE;
 static const int LATCH_PIN = GPIO_PIN_5;
-#define PERIPHAL Board_SPI1
+#define PERIPHAL Board_SPI1*/
 
 SPI_Handle handle;
 
@@ -51,13 +51,20 @@ void OutputFxn(UArg arg0, UArg arg1)
     uint32_t wait_ticks = (uint32_t) arg1;
 
     int i;
-    for (i = 0; i < 8; i++) {
+    /*for (i = 0; i < 8; i++) {
         leds |= 1 << i;
-    }
+    }*/
+
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, 0);
+    Task_sleep(5);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
 
     while (1) {
 
+        leds++;
+
         Bool transferOK;
+
         SPI_Transaction spiTransaction;
         spiTransaction.count = 1;
         spiTransaction.txBuf = &leds;
@@ -65,9 +72,9 @@ void OutputFxn(UArg arg0, UArg arg1)
 
         transferOK = SPI_transfer(handle, &spiTransaction);
         // TODO for each
-        transferOK = SPI_transfer(handle, &spiTransaction);
-        transferOK = SPI_transfer(handle, &spiTransaction);
-        transferOK = SPI_transfer(handle, &spiTransaction);
+        //transferOK = SPI_transfer(handle, &spiTransaction);
+        //transferOK = SPI_transfer(handle, &spiTransaction);
+        //transferOK = SPI_transfer(handle, &spiTransaction);
 
         if (!transferOK) {
             System_printf("Error in SPI transaction\n");
@@ -80,12 +87,11 @@ void OutputFxn(UArg arg0, UArg arg1)
 
         // Latch
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, LATCH_PIN);
+        Task_sleep(5);
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, 0);
 
         Task_sleep(wait_ticks);
 
-        GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
-        GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, 0);
     }
 }
 
@@ -119,23 +125,25 @@ int setup_spi() {
 
     //Board_initGeneral(120 * 1000 * 1000);
 
-    Board_initGPIO();
-    Board_initSPI();
 
     // Reset = C7
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    //GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_7);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_7);
+    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP);
+    //GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_4);
 
     // Latch = H2
     SysCtlPeripheralEnable(LATCH_SYS_PORT);
     GPIOPinTypeGPIOOutput(LATCH_PORT, LATCH_PIN);
+
+    Board_initSPI();
 
     SPI_Params spiParams;
 
     SPI_Params_init(&spiParams);
     spiParams.transferMode = SPI_MODE_BLOCKING;
     spiParams.transferCallbackFxn = NULL;
-    spiParams.bitRate = 2000000;
+    spiParams.bitRate = 200000;
     spiParams.dataSize = 8;
     spiParams.frameFormat = SPI_POL0_PHA0;
     spiParams.mode = SPI_MASTER;

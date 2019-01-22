@@ -26,6 +26,7 @@
 #include <ti/sysbios/knl/Event.h>
 #include <ti/sysbios/hal/Timer.h>
 #include <ti/drivers/SPI.h>
+#include <ti/drivers/UART.h>
 
 /* Driverlib headers */
 #include <driverlib/gpio.h>
@@ -43,8 +44,7 @@
 #define CSON GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, 0);
 #define CSOFF GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, GPIO_PIN_5);
 
-/* Prototypes */
-uint16_t getADC(uint8_t value1, uint8_t value2, SPI_Handle spi);
+uint8_t activate;
 
 void InputFxn(UArg arg0, UArg arg1)
 {
@@ -63,6 +63,12 @@ void InputFxn(UArg arg0, UArg arg1)
     GPIOPadConfigGet(GPIO_PORTD_BASE, GPIO_PIN_4, &ui32Strength, &ui32PinType);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_4, ui32Strength, GPIO_PIN_TYPE_STD_WPU);
     ui8button = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_4);
+
+    if (activate){
+        System_printf("Werte X-Achse: %d  \tWerte Y-Achse: %d\n", XValue, YValue);
+        System_flush();
+    }
+    else {};
 
     convert(XValue, YValue);
 
@@ -111,21 +117,22 @@ uint16_t getADC(uint8_t value1, uint8_t value2, SPI_Handle spi)
 int setup_Task(SPI_Handle spi)
 {
     Task_Params taskParams;
-        Task_Handle taskOutput;
-        Error_Block eb;
+    Task_Handle taskOutput;
+    Error_Block eb;
 
-        Error_init(&eb);
-        Task_Params_init(&taskParams);
-        taskParams.stackSize = 1064;
-        taskParams.priority = 15; //task priority
-        taskParams.arg0 = (UArg)spi;
+    Error_init(&eb);
+    Task_Params_init(&taskParams);
+    taskParams.stackSize = 1064;
+    taskParams.priority = 15;
+    taskParams.arg0 = (UArg)spi;
 
-        taskOutput = Task_create((Task_FuncPtr)InputFxn, &taskParams, &eb);
-        if (taskOutput == NULL) {
-            System_abort("Task creation failed");
-            System_flush();
+    taskOutput = Task_create((Task_FuncPtr)InputFxn, &taskParams, &eb);
+    if (taskOutput == NULL) {
+       System_abort("Task creation failed");
+       System_flush();
 
-        }
-       return (0);
-
+    }
+    return (0);
 }
+
+

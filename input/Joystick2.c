@@ -45,14 +45,13 @@
 #define CSON GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, 0);
 #define CSOFF GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, GPIO_PIN_5);
 
-
 void setup_input_task(void)
 {
     GPIOPinTypeGPIOOutput(GPIO_PORTQ_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3); //SPI
     GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_5); //CS
     GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_0); //Button
 
-
+    Board_initSPI();
 
     UInt peripheralNum = 1;
     SPI_Handle spi;
@@ -74,7 +73,7 @@ void setup_input_task(void)
         else{
         System_printf("SPI-Handle: %p\n", spi);
         }
-
+    System_flush();
     (void)setup_Task(spi);
 
 }

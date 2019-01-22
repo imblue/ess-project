@@ -37,8 +37,9 @@
 #include "Output_Task.h"
 #include "Output_UART.h"
 #include "InputOutput_Connector.h"
+#include "Joystick.h"
 
-uint16_t getADC(uint8_t value1, uint8_t value2, SPI_Handle spi);
+uint8_t activate;
 
 int output_UART_read(UART_Handle uart) {
 
@@ -106,21 +107,23 @@ int output_UART_read(UART_Handle uart) {
 
 int input_UART_read(UART_Handle uart) {
 	
-	uint16_t XValue;
-    uint16_t YValue;
 	uint8_t ui8button;
-	
-	XValue = getADC(6, 64, spi);
-    YValue = getADC(6, 0, spi);
+	uint32_t ui32Strength;
+	uint32_t ui32PinType;
 
-    System_printf("Wert X-Achse: %d   \tWert Y-Achse: %d\n", XValue, YValue);
-    System_flush();
-	
+	activate = 1;
+
+	GPIOPadConfigGet(GPIO_PORTD_BASE, GPIO_PIN_4, &ui32Strength, &ui32PinType);
+	GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_4, ui32Strength, GPIO_PIN_TYPE_STD_WPU);
+	ui8button = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_4);
+
 	if (ui8button == 0)
     {
-        Task_sleep(10);
         System_printf("CLICK\n");
         System_flush();
     }
     else {};
+
+	return 0;
 }
+

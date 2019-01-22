@@ -38,6 +38,8 @@
 #include "Output_UART.h"
 #include "InputOutput_Connector.h"
 
+uint16_t getADC(uint8_t value1, uint8_t value2, SPI_Handle spi);
+
 int output_UART_read(UART_Handle uart) {
 
     char lb[2] = "\r\n";
@@ -102,3 +104,23 @@ int output_UART_read(UART_Handle uart) {
     return 0;
 }
 
+int output2_UART_read(UART_Handle uart) {
+	
+	uint16_t XValue;
+    uint16_t YValue;
+	uint8_t ui8button;
+	
+	XValue = getADC(6, 64, spi);
+    YValue = getADC(6, 0, spi);
+
+    System_printf("Wert X-Achse: %d   \tWert Y-Achse: %d\n", XValue, YValue);
+    System_flush();
+	
+	if (ui8button == 0)
+    {
+        Task_sleep(10);
+        System_printf("CLICK\n");
+        System_flush();
+    }
+    else {};
+}

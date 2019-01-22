@@ -9,5 +9,6 @@
 #define LOCAL_INC_OUTPUT_UART_H_
 
 int output_UART_read(UART_Handle uart);
+int output2_UART_read(UART_Handle uart);
 
 #endif /* LOCAL_INC_OUTPUT_UART_H_ */

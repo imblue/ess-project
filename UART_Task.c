@@ -69,6 +69,10 @@ void UARTFxn(UArg arg0, UArg arg1) {
         if (input == 'o') {
             output_UART_read(uart);
         }
+		
+		if (input == 't') {
+			output2_UART_read(uart);
+		}
     }
 }
 

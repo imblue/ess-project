@@ -60,9 +60,6 @@ void InputFxn(UArg arg0, UArg arg1)
     XValue = getADC(6, 64, spi);
     YValue = getADC(6, 0, spi);
 
-    System_printf("Wert X-Achse: %d   \tWert Y-Achse: %d\n", XValue, YValue);
-    System_flush();
-
     GPIOPadConfigGet(GPIO_PORTD_BASE, GPIO_PIN_4, &ui32Strength, &ui32PinType);
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_4, ui32Strength, GPIO_PIN_TYPE_STD_WPU);
     ui8button = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_4);
@@ -73,8 +70,6 @@ void InputFxn(UArg arg0, UArg arg1)
     {
         changePressedState(1);
         Task_sleep(10);
-        System_printf("CLICK\n");
-        System_flush();
     }
     else {};
     changePressedState(0);

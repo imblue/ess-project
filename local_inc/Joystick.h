@@ -37,6 +37,5 @@
 
 void OutputFxn(UArg arg0, UArg arg1);
 int setup_Task(SPI_Handle spi);
-int setup_TaskUart(void);
 
 #endif

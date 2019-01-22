@@ -54,7 +54,6 @@ int main(void)
     GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_0); //Button
 
     Board_initSPI();
-    Board_initUART();
 
     UInt peripheralNum = 1;
     SPI_Handle spi;
@@ -78,7 +77,6 @@ int main(void)
         }
 
     (void)setup_Task(spi);
-    (void)setup_TaskUart;
 
     System_printf("Start BIOS\n");
     System_flush();

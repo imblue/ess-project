@@ -4,9 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <inc/hw_memmap.h>
+#include <ti/drivers/SPI.h>
 
 void InputFxn(UArg arg0, UArg arg1);
 int setup_Task(SPI_Handle spi);
-int setup_input_task(void);
+void setup_input_task(void);
 
 #endif

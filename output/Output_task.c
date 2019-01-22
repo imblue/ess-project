@@ -41,57 +41,56 @@ static const int LATCH_PIN = GPIO_PIN_5;
 
 SPI_Handle handle;
 
-uint8_t leds = 0;
+uint32_t leds32 = 0;
+
+void transfer8(uint8_t _data) {
+    SPI_Transaction spiTransaction;
+    spiTransaction.count = 1;
+    spiTransaction.txBuf = &_data;
+    spiTransaction.rxBuf = NULL;
+
+    Bool transferOK = SPI_transfer(handle, &spiTransaction);
+
+    if (!transferOK) {
+        System_printf("Error in SPI transaction\n");
+        System_flush();
+    }
+}
+
+void transfer32(uint32_t _data) {
+    uint8_t temp_buffer;
+
+    temp_buffer = _data;
+    transfer8(temp_buffer);
+
+    temp_buffer = _data >> 8;
+    transfer8(temp_buffer);
+
+    temp_buffer = _data >> 16;
+    transfer8(temp_buffer);
+
+    temp_buffer = _data >> 24;
+    transfer8(temp_buffer);
+}
 
 /*
  *  Perform blink operation on LED given as arg0, with period defined by arg1.
  */
-void OutputFxn(UArg arg0, UArg arg1)
-{
+void OutputFxn(UArg arg0, UArg arg1) {
     uint32_t wait_ticks = (uint32_t) arg1;
 
-    int i;
-    /*for (i = 0; i < 8; i++) {
-        leds |= 1 << i;
-    }*/
-
+    // Reset on high
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, 0);
-    Task_sleep(5);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
 
     while (1) {
-
-        leds++;
-
-        Bool transferOK;
-
-        SPI_Transaction spiTransaction;
-        spiTransaction.count = 1;
-        spiTransaction.txBuf = &leds;
-        spiTransaction.rxBuf = NULL;
-
-        transferOK = SPI_transfer(handle, &spiTransaction);
-        // TODO for each
-        //transferOK = SPI_transfer(handle, &spiTransaction);
-        //transferOK = SPI_transfer(handle, &spiTransaction);
-        //transferOK = SPI_transfer(handle, &spiTransaction);
-
-        if (!transferOK) {
-            System_printf("Error in SPI transaction\n");
-            System_flush();
-        }
-        else {
-            System_printf("Successfull transaction\n");
-            System_flush();
-        }
+        transfer32(leds32);
 
         // Latch
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, LATCH_PIN);
-        Task_sleep(5);
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, 0);
 
         Task_sleep(wait_ticks);
-
     }
 }
 
@@ -158,8 +157,8 @@ int setup_spi() {
     return 0;
 }
 
-int show_leds(uint8_t l) {
-    leds = l;
+int show_leds(uint32_t l) {
+    leds32 = l;
     return 0;
 }
 

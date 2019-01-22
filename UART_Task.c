@@ -31,17 +31,15 @@
 
 /* Application headers */
 #include "UART_Task.h"
-
+#include "Output_UART.h"
 
 /*
  *  ======== UART  ========
- *  Echo Characters recieved and show reception on Port N Led 0
  */
-void UARTFxn(UArg arg0, UArg arg1)
-{
+void UARTFxn(UArg arg0, UArg arg1) {
     UART_Handle uart;
     UART_Params uartParams;
-    const char echoPrompt[] = "\fEchoing characters:\r\n";
+    const char echoPrompt[] = "\fCommands:\r\no => Debug Output\r\ni => Debug Input\r\n";
 
     /* Create a UART with data processing off. */
     UART_Params_init(&uartParams);
@@ -62,10 +60,15 @@ void UARTFxn(UArg arg0, UArg arg1)
     while (1) {
         char input;
         UART_read(uart, &input, 1);
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-        UART_write(uart, &input, 1); // Remove this line to stop echoing!
-        Task_sleep(5);
+        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, GPIO_PIN_0);
+        // Echo input
+        UART_write(uart, &input, 1);
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+
+        // TODO Input
+        if (input == 'o') {
+            output_UART_read(uart);
+        }
     }
 }
 

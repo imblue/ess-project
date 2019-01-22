@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <inc/hw_memmap.h>
 
 /* XDCtools Header files */
@@ -37,24 +38,25 @@
 #include "Output_UART.h"
 
 int output_UART_read(UART_Handle uart) {
-    int leds = 0;
 
-    int i;
-    for (i = 0; i < 8; i++) {
-        char input;
-        UART_read(uart, &input, 1);
-        if (input == '1') {
-            leds |= 1 << i;
-        }
+    while (1) {
+        char input[2];
+        UART_read(uart, &input, 2);
 
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-        UART_write(uart, &input, 1); // Remove this line to stop echoing!
+        UART_write(uart, &input, 2); // Echo
 
         Task_sleep(5);
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
-    }
 
-    show_leds(leds);
+        uint8_t selectedLed;
+        sscanf(input, "%d", &selectedLed);
+
+        uint32_t leds = 0;
+        leds |= 1 << (selectedLed - 1);
+
+        show_leds(leds);
+    }
 
     return 0;
 }

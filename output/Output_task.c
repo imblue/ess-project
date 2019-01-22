@@ -41,6 +41,7 @@ static const int LATCH_PIN = GPIO_PIN_5;
 
 SPI_Handle handle;
 
+uint8_t pwm = 100;
 uint32_t leds32 = 0;
 
 void transfer8(uint8_t _data) {
@@ -84,13 +85,21 @@ void OutputFxn(UArg arg0, UArg arg1) {
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_7, GPIO_PIN_7);
 
     while (1) {
-        transfer32(leds32);
+        int i;
+        for (i = 0; i < 100; i++) {
+            if (i < pwm) {
+                transfer32(leds32);
+            } else {
+                transfer32(0);
+            }
+            Task_sleep(1);
+        }
 
         // Latch
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, LATCH_PIN);
         GPIOPinWrite(LATCH_PORT, LATCH_PIN, 0);
 
-        Task_sleep(wait_ticks);
+        Task_sleep(1);
     }
 }
 
@@ -122,20 +131,13 @@ int setup_Output_Task(int prio, xdc_String name, uint32_t wait_ticks) {
 
 int setup_spi() {
 
-    //Board_initGeneral(120 * 1000 * 1000);
-
-
     // Reset = C7
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_7);
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP);
-    //GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_4);
 
     // Latch = H2
     SysCtlPeripheralEnable(LATCH_SYS_PORT);
     GPIOPinTypeGPIOOutput(LATCH_PORT, LATCH_PIN);
-
-    Board_initSPI();
 
     SPI_Params spiParams;
 
@@ -152,17 +154,15 @@ int setup_spi() {
       System_printf("SPI did not open\n");
     }
 
-    System_flush();
-
     return 0;
 }
 
-int show_leds(uint32_t l) {
-    leds32 = l;
+int show_leds(uint32_t _leds32) {
+    leds32 = _leds32;
     return 0;
 }
 
-int set_pwm(uint8_t pwm) {
-    // TODO
+int set_pwm(uint8_t _pwm) {
+    pwm = _pwm;
     return 0;
 }

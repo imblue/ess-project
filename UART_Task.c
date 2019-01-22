@@ -39,7 +39,7 @@
 void UARTFxn(UArg arg0, UArg arg1) {
     UART_Handle uart;
     UART_Params uartParams;
-    const char echoPrompt[] = "\fCommands:\r\no => Debug Output\r\ni => Debug Input\r\n";
+    const char echoPrompt[] = "\fCommands:\r\no => Debug Output\r\ni => Debug Input\r\nc => Connector\r\n";
 
     /* Create a UART with data processing off. */
     UART_Params_init(&uartParams);

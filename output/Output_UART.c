@@ -36,26 +36,67 @@
 /* Application headers */
 #include "Output_Task.h"
 #include "Output_UART.h"
+#include "InputOutput_Connector.h"
 
 int output_UART_read(UART_Handle uart) {
 
+    char lb[2] = "\r\n";
+
     while (1) {
-        char input[2];
-        UART_read(uart, &input, 2);
+        // Mode
+        char inputMode;
+        UART_read(uart, &inputMode, 1);
 
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-        UART_write(uart, &input, 2); // Echo
-
-        Task_sleep(5);
+        UART_write(uart, &inputMode, 1); // Echo
+        UART_write(uart, &lb, 2); // Echo
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
 
-        uint8_t selectedLed;
-        sscanf(input, "%d", &selectedLed);
+        if (inputMode == 'l') {
+            char inputL[2];
+            UART_read(uart, &inputL, 2);
 
-        uint32_t leds = 0;
-        leds |= 1 << (selectedLed - 1);
+            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
+            UART_write(uart, &inputL, 2); // Echo
+            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
 
-        show_leds(leds);
+            uint8_t selectedLed;
+            sscanf(inputL, "%d", &selectedLed);
+
+            uint32_t leds = 0;
+            leds |= 1 << (selectedLed - 1);
+
+            show_leds(leds);
+        } else if (inputMode == 'b') {
+
+            char inputB;
+            UART_read(uart, &inputB, 1);
+
+            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
+            UART_write(uart, &inputB, 1); // Echo
+            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+
+            if (inputB == '1') {
+                changePressedState(1);
+            } else {
+                changePressedState(0);
+            }
+        } else if (inputMode == 'p') {
+            uint8_t inputP[3];
+            UART_read(uart, &inputP, 3);
+
+            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
+            UART_write(uart, &inputP, 3); // Echo
+            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+
+            uint8_t selectedPwm;
+            sscanf(inputP, "%d", &selectedPwm);
+            set_pwm(selectedPwm);
+        } else if (inputMode == 'e') {
+            return 0;
+        } else {
+            // TODO Unknown command
+        }
     }
 
     return 0;

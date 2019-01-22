@@ -71,7 +71,7 @@ void UARTFxn(UArg arg0, UArg arg1) {
         }
 		
 		if (input == 't') {
-			output2_UART_read(uart);
+			input_UART_read(uart);
 		}
     }
 }

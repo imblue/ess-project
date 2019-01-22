@@ -104,7 +104,7 @@ int output_UART_read(UART_Handle uart) {
     return 0;
 }
 
-int output2_UART_read(UART_Handle uart) {
+int input_UART_read(UART_Handle uart) {
 	
 	uint16_t XValue;
     uint16_t YValue;

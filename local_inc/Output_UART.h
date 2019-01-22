@@ -10,6 +10,4 @@
 
 int output_UART_read(UART_Handle uart);
 
-
-
 #endif /* LOCAL_INC_OUTPUT_UART_H_ */

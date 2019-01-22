@@ -34,48 +34,24 @@
 #include <Output_Task.h>
 #include <UART_Task.h>
 
-int main(void)
-{
+int main(void) {
     uint32_t ui32SysClock;
     ui32SysClock = Board_initGeneral(120*1000*1000);
 
-    //static struct led_descriptor led_desc[2];
-    /* Call board init functions. */
-    /*(void)ui32SysClock; // We don't really need this (yet)
+    // TODO Input-Task
 
-    led_desc[0].port_base = GPIO_PORTN_BASE;
-    led_desc[0].led = GPIO_PIN_1;*/
-    /* Initialize+start Blink Task*/
-    //(void)setup_Blink_Task(&led_desc[0], 500);
-    /* System_printf() is VERY slow!*/
-    //System_printf("Created Blink Task1\n");
-    //System_flush();
-
-    //led_desc[1].port_base = GPIO_PORTF_BASE;
-    //led_desc[1].led = GPIO_PIN_0;
-    /*Initialize+start Blink Task*/
-    //(void)setup_Blink_Task(&led_desc[1], 250);
-    //System_printf("Created Blink Task2\n");
-    //System_flush();*/
-
-
-
-    // ========== Output
+    // Setup Output-Task
     setup_spi();
     (void) setup_Output_Task(15, "OutputTask 1", 500);
-    System_printf("OutputTask created\n");
+    System_printf("Created Output Task\n");
 
-
-
-    /*Initialize+start UART Task*/
+    // Setup UART
     (void)setup_UART_Task();
     System_printf("Created UART Task\n");
 
-    /* SysMin will only print to the console upon calling flush or exit */
-
-    System_printf("Start BIOS\n");
+    System_printf("Starting BIOS\n");
     System_flush();
 
-    /* Start BIOS */
+    // Start BIOS
     BIOS_start();
 }

@@ -37,6 +37,8 @@
 #include <EK_TM4C1294XL.h>
 #include <driverlib/pin_map.h>/*supplies GPIO_PIN_x*/
 #include "Joystick.h"
+#include "InputOutput_Connector.h"
+#include "Output_Task.h"
 
 /* Defines */
 #define CSON GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, 0);
@@ -66,13 +68,20 @@ void InputFxn(UArg arg0, UArg arg1)
     GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_4, ui32Strength, GPIO_PIN_TYPE_STD_WPU);
     ui8button = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_4);
 
+    convert(XValue, YValue);
+
     if (ui8button == 0)
     {
+        changePressedState(1);
         Task_sleep(10);
         System_printf("CLICK\n");
         System_flush();
     }
-    else {};
+    else {
+        changePressedState(0);
+    }
+
+    Task_sleep(50);
     }
 }
 
@@ -117,7 +126,7 @@ int setup_Task(SPI_Handle spi)
         Error_init(&eb);
         Task_Params_init(&taskParams);
         taskParams.stackSize = 1064;;
-        taskParams.priority = 15; //task priority
+        taskParams.priority = 1; //task priority
         taskParams.arg0 = (UArg)spi;
 
         taskOutput = Task_create((Task_FuncPtr)InputFxn, &taskParams, &eb);

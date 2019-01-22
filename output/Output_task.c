@@ -108,9 +108,9 @@ int setup_Output_Task(int prio, xdc_String name, uint32_t wait_ticks) {
     Task_Params_init(&taskParams);
     taskParams.instance->name = name;
     taskParams.stackSize = 1024; /* stack in bytes */
-    taskParams.priority = prio; /* 0-15 (15 is highest priority on default -> see RTOS Task configuration) */
+    taskParams.priority = 15; /* 0-15 (15 is highest priority on default -> see RTOS Task configuration) */
     taskParams.arg0 = (UArg) name; // TODO Maybe something good can be sent later
-    taskParams.arg1 = (UArg) wait_ticks; /* pass periods in ticks as arg1 */
+    taskParams.arg1 = (UArg) 30; /* pass periods in ticks as arg1 */
 
     handler = Task_create((Task_FuncPtr) OutputFxn, &taskParams, &eb);
     if (handler == NULL) {
@@ -142,7 +142,7 @@ int setup_spi() {
     SPI_Params_init(&spiParams);
     spiParams.transferMode = SPI_MODE_BLOCKING;
     spiParams.transferCallbackFxn = NULL;
-    spiParams.bitRate = 200000;
+    spiParams.bitRate = 1000000;
     spiParams.dataSize = 8;
     spiParams.frameFormat = SPI_POL0_PHA0;
     spiParams.mode = SPI_MASTER;

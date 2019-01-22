@@ -33,13 +33,17 @@
 /* Application headers */
 #include <Output_Task.h>
 #include <UART_Task.h>
+#include <Joystick.h>
 
 int main(void) {
     uint32_t ui32SysClock;
     ui32SysClock = Board_initGeneral(120*1000*1000);
-
+	
+	Board_initSPI();
+	
     // TODO Input-Task
-
+	setup_input_task();
+	
     // Setup Output-Task
     setup_spi();
     (void) setup_Output_Task(15, "OutputTask 1", 500);

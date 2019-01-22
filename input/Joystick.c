@@ -45,7 +45,7 @@
 /* Prototypes */
 uint16_t getADC(uint8_t value1, uint8_t value2, SPI_Handle spi);
 
-void OutputFxn(UArg arg0, UArg arg1)
+void InputFxn(UArg arg0, UArg arg1)
 {
     SPI_Handle spi = (SPI_Handle)arg0;
     uint16_t XValue;
@@ -120,7 +120,7 @@ int setup_Task(SPI_Handle spi)
         taskParams.priority = 15; //task priority
         taskParams.arg0 = (UArg)spi;
 
-        taskOutput = Task_create((Task_FuncPtr)OutputFxn, &taskParams, &eb);
+        taskOutput = Task_create((Task_FuncPtr)InputFxn, &taskParams, &eb);
         if (taskOutput == NULL) {
             System_abort("Task creation failed");
             System_flush();

@@ -45,15 +45,13 @@
 #define CSON GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, 0);
 #define CSOFF GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_5, 1);
 
-int main(void)
+int setup_input_task(void)
 {
-    Board_initGeneral(120 * 1000 * 1000);
-
     GPIOPinTypeGPIOOutput(GPIO_PORTQ_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3); //SPI
     GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_5); //CS
     GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_0); //Button
 
-    Board_initSPI();
+    
 
     UInt peripheralNum = 1;
     SPI_Handle spi;
@@ -77,10 +75,6 @@ int main(void)
         }
 
     (void)setup_Task(spi);
-
-    System_printf("Start BIOS\n");
-    System_flush();
-
-    BIOS_start();
+    
 }
 

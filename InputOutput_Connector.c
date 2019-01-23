@@ -76,32 +76,52 @@ void convert(uint16_t x, uint16_t y) {
         return;
     }
 
+    Bool rightSide = x > 2046;
+
+    uint32_t a;
     // === Rechts
-    if (x > 2046) {
-        uint32_t a = x - 2046;
-
-        uint32_t b;
-        if (y > 2046) {
-            b = y - 2046;
-        } else {
-            b = 2046 - y;
-        }
-
-        double c = sqrt(pow(a, 2) + pow(b, 2));
-        double ac = a / c;
-        double alpha = asin(ac);
-
-        double alphaProzent = alpha / 90 * 100;
-        double led = 8 * alphaProzent;
-        uint16_t ledint = led;
-        leds |= 1 << (8 - ledint);
-        show_leds(leds);
-        return;
+    if (rightSide) {
+        a = x - 2046;
+    } else {
+        a = 2046 - x;
     }
 
 
+    uint32_t b;
+    if (y > 2046) {
+        b = y - 2046;
+    } else {
+        b = 2046 - y;
+    }
 
-    // TODO
+    double c = sqrt(pow(a, 2) + pow(b, 2));
+    double ac = a / c;
+    double alpha = asin(ac);
+
+    double alphaProzent = alpha / 90 * 100;
+    double led = 8 * alphaProzent;
+    uint16_t ledint = led;
+
+    // Damit eine leuchtet wenn 0,irgendwas
+    if (ledint == 0) {
+        ledint = 1;
+    }
+
+    if (rightSide) {
+        if (y < 2046) { // Rechts oben
+            leds |= 1 << (8 - ledint);
+        } else { // Rechts unten
+            leds |= 1 << (24 + ledint);
+        }
+    } else {
+        if (y < 2046) { // Links oben
+            leds |= 1 << (16 - ledint);
+        } else { // Links unten
+            leds |= 1 << (26 + ledint);
+        }
+    }
+
+    show_leds(leds);
 }
 
 void changePressedState(Bool _pressed){
@@ -120,7 +140,7 @@ void changePressedState(Bool _pressed){
     }
 
     show_leds(leds);
-    set_pwm(100);
+    //set_pwm(100);
 }
 
 void setDebugMode(Bool _debugMode) {

@@ -40,32 +40,43 @@
 
 UART_Handle uart;
 
+void output_UART_write(UART_Handle _uart, char msg[], Bool withLinebreak) {
+    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
+    UART_write(uart, &msg, sizeof(msg));
+
+    if (withLinebreak) {
+        char lb[2] = "\r\n";
+        UART_write(uart, &lb, 2);
+    }
+
+    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+}
+
 int output_UART_read(UART_Handle _uart) {
     uart = _uart;
 
-    char lb[2] = "\r\n";
+    char info[] = "Usage:\r\nl => Set LED\r\nb => Simulate Button-Click\r\ne => Exit";
+    output_UART_write(_uart, info, 1);
 
     setDebugMode(1);
 
     while (1) {
         // Mode
-        char inputMode;
-        UART_read(uart, &inputMode, 1);
+        char inputModeS[1];
+        UART_read(uart, &inputModeS, 1);
 
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-        UART_write(uart, &inputMode, 1); // Echo
-        UART_write(uart, &lb, 2); // Echo
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+        output_UART_write(_uart, inputModeS, 1);
 
+        char inputMode = inputModeS[0];
         if (inputMode == 'l') {
+            // TODO Info-Text
+
             char inputL[2];
             UART_read(uart, &inputL, 2);
 
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-            UART_write(uart, &inputL, 2); // Echo
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+            output_UART_write(_uart, inputL, 1); // Echo
 
-            uint8_t selectedLed;
+            int selectedLed;
             sscanf(inputL, "%d", &selectedLed);
 
             uint32_t leds = 0;
@@ -73,20 +84,19 @@ int output_UART_read(UART_Handle _uart) {
 
             show_leds(leds);
         } else if (inputMode == 'b') {
+            // TODO Info-Text
 
-            char inputB;
+            char inputB[1];
             UART_read(uart, &inputB, 1);
 
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-            UART_write(uart, &inputB, 1); // Echo
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+            output_UART_write(_uart, inputB, 1); // Echo
 
-            if (inputB == '1') {
+            if (inputB[0] == '1') {
                 changePressedState(1);
             } else {
                 changePressedState(0);
             }
-        } else if (inputMode == 'p') {
+        } /*else if (inputMode == 'p') {
             uint8_t inputP[3];
             UART_read(uart, &inputP, 3);
 
@@ -97,15 +107,18 @@ int output_UART_read(UART_Handle _uart) {
             uint8_t selectedPwm;
             sscanf(inputP, "%d", &selectedPwm);
             set_pwm(selectedPwm);
-        } else if (inputMode == 'e') {
+        }*/ else if (inputMode == 'e') {
+            char exitInfo[] = "Exit Debug-Mode";
+            output_UART_write(_uart, exitInfo, 1);
+
             setDebugMode(0);
+            changePressedState(0);
             return 0;
-        } else {
-            // TODO Unknown command
+        } else { // Unknown command
+            char ucInfo[] = "Unknown command";
+            output_UART_write(_uart, ucInfo, 1);
         }
     }
-
-    return 0;
 }
 
 void output_send(char msg[]) {

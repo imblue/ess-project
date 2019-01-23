@@ -114,16 +114,16 @@ void convert(uint16_t x, uint16_t y) {
         }
     } else {
         if (y < 2046) { // Links oben
-            leds |= 1 << (16 - ledint);
+            leds |= 1 << (8 + ledint);
         } else { // Links unten
-            leds |= 1 << (26 + ledint);
+            leds |= 1 << (24 - ledint);
         }
     }
 
     show_leds(leds);
 }
 
-void changePressedState(Bool _pressed){
+void changePressedStateInternal(Bool _pressed) {
     if (pressed == _pressed) {
         return;
     }
@@ -142,7 +142,19 @@ void changePressedState(Bool _pressed){
     //set_pwm(100);
 }
 
+void changePressedState(Bool _pressed) {
+    if (debugMode) {
+        return;
+    }
+
+    changePressedStateInternal(_pressed);
+}
+
 void setDebugMode(Bool _debugMode) {
     debugMode = _debugMode;
+}
+
+void debugPressedState(Bool _pressed) {
+    changePressedStateInternal(_pressed);
 }
 

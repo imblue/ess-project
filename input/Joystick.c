@@ -68,7 +68,6 @@ void InputFxn(UArg arg0, UArg arg1)
         System_printf("Werte X-Achse: %d  \tWerte Y-Achse: %d\n", XValue, YValue);
         System_flush();
     }
-    else {};
 
     convert(XValue, YValue);
 

@@ -15,5 +15,6 @@
 void convert(uint16_t x, uint16_t y);
 
 void changePressedState(Bool on);
+void debugPressedState(Bool _pressed);
 
 #endif /* LOCAL_INC_INPUTOUTPUT_CONNECTOR_H_ */

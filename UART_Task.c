@@ -39,7 +39,7 @@
 void UARTFxn(UArg arg0, UArg arg1) {
     UART_Handle uart;
     UART_Params uartParams;
-    const char echoPrompt[] = "\fCommands:\r\no => Debug Output\r\ni => Debug Input\r\nc => Connector\r\n";
+    const char echoPrompt[] = "\fCommands:\r\no => Debug Output\r\nt => Debug Input (Hold for button)\r\n";
 
     /* Create a UART with data processing off. */
     UART_Params_init(&uartParams);
@@ -65,7 +65,6 @@ void UARTFxn(UArg arg0, UArg arg1) {
         UART_write(uart, &input, 1);
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
 
-        // TODO Input
         if (input == 'o') {
             output_UART_read(uart);
         }

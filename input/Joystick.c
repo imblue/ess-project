@@ -77,8 +77,11 @@ void InputFxn(UArg arg0, UArg arg1)
         changePressedState(1);
         Task_sleep(10);
     }
-    else {};
-    changePressedState(0);
+    else {
+        changePressedState(0);
+    }
+
+    Task_sleep(50);
     }
 }
 

@@ -41,29 +41,41 @@
 
 uint8_t activate;
 
-int output_UART_read(UART_Handle uart) {
+void output_UART_write(UART_Handle uart, char msg[], Bool withLinebreak) {
+    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
+    UART_write(uart, &msg, sizeof(msg));
 
-    char lb[2] = "\r\n";
+    if (withLinebreak) {
+        char lb[2] = "\r\n";
+        UART_write(uart, &lb, 2);
+    }
+
+    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+}
+
+int output_UART_read(UART_Handle uart) {
+    char info[] = "Usage:\r\nl => Set LED\r\nb => Simulate Button-Click\r\ne => Exit";
+    output_UART_write(uart, info, 1);
+
+    setDebugMode(1);
 
     while (1) {
         // Mode
-        char inputMode;
-        UART_read(uart, &inputMode, 1);
+        char inputModeS[1];
+        UART_read(uart, &inputModeS, 1);
 
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-        UART_write(uart, &inputMode, 1); // Echo
-        UART_write(uart, &lb, 2); // Echo
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+        output_UART_write(uart, inputModeS, 1);
 
+        char inputMode = inputModeS[0];
         if (inputMode == 'l') {
+            // TODO Info-Text
+
             char inputL[2];
             UART_read(uart, &inputL, 2);
 
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-            UART_write(uart, &inputL, 2); // Echo
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+            output_UART_write(uart, inputL, 1); // Echo
 
-            uint8_t selectedLed;
+            int selectedLed;
             sscanf(inputL, "%d", &selectedLed);
 
             uint32_t leds = 0;
@@ -71,20 +83,19 @@ int output_UART_read(UART_Handle uart) {
 
             show_leds(leds);
         } else if (inputMode == 'b') {
+            // TODO Info-Text
 
-            char inputB;
+            char inputB[1];
             UART_read(uart, &inputB, 1);
 
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 1);
-            UART_write(uart, &inputB, 1); // Echo
-            GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
+            output_UART_write(uart, inputB, 1); // Echo
 
-            if (inputB == '1') {
+            if (inputB[0] == '1') {
                 changePressedState(1);
             } else {
                 changePressedState(0);
             }
-        } else if (inputMode == 'p') {
+        } /*else if (inputMode == 'p') {
             uint8_t inputP[3];
             UART_read(uart, &inputP, 3);
 
@@ -95,35 +106,38 @@ int output_UART_read(UART_Handle uart) {
             uint8_t selectedPwm;
             sscanf(inputP, "%d", &selectedPwm);
             set_pwm(selectedPwm);
-        } else if (inputMode == 'e') {
+        }*/ else if (inputMode == 'e') {
+            char exitInfo[] = "Exit Debug-Mode";
+            output_UART_write(uart, exitInfo, 1);
+
+            setDebugMode(0);
+            changePressedState(0);
             return 0;
-        } else {
-            // TODO Unknown command
+        } else { // Unknown command
+            char ucInfo[] = "Unknown command";
+            output_UART_write(uart, ucInfo, 1);
         }
     }
-
-    return 0;
 }
 
 int input_UART_read(UART_Handle uart) {
-	
-	uint8_t ui8button;
-	uint32_t ui32Strength;
-	uint32_t ui32PinType;
 
-	activate = 1;
+    uint8_t ui8button;
+    uint32_t ui32Strength;
+    uint32_t ui32PinType;
 
-	GPIOPadConfigGet(GPIO_PORTD_BASE, GPIO_PIN_4, &ui32Strength, &ui32PinType);
-	GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_4, ui32Strength, GPIO_PIN_TYPE_STD_WPU);
-	ui8button = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_4);
+    activate = 1;
 
-	if (ui8button == 0)
+    GPIOPadConfigGet(GPIO_PORTD_BASE, GPIO_PIN_4, &ui32Strength, &ui32PinType);
+    GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_4, ui32Strength, GPIO_PIN_TYPE_STD_WPU);
+    ui8button = GPIOPinRead(GPIO_PORTD_BASE, GPIO_PIN_4);
+
+    if (ui8button == 0)
     {
         System_printf("CLICK\n");
         System_flush();
     }
     else {};
 
-	return 0;
+    return 0;
 }
-
